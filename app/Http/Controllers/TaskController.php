@@ -18,7 +18,15 @@ class TaskController extends Controller
         $tasks = Task::latest()->paginate(8);
 
         foreach ($tasks as $task) {
-            $task->due_date = Carbon::parse($task->due_date)->format('d-m-Y');
+            if ($task->due_date !== null) {
+                $task->due_date = Carbon::parse($task->due_date)->format('d-m-Y');
+            }
+
+            if ($task->finish_date !== null) {
+                $task->finish_date = Carbon::parse($task->finish_date)->format('d-m-Y');
+            } else {
+                $task->finish_date = 'Sin completar';
+            }
         }
 
         return view('index', ['tasks' => $tasks]);
@@ -42,6 +50,17 @@ class TaskController extends Controller
             'title' => 'required',
             'description' => 'required'
         ]);
+
+        if ($request->status === null) {
+            $request->merge(['status' => 'Pendiente']);
+        }
+
+
+
+        if ($request->status == 'Completada') {
+            $request->merge(['finish_date' => date('Y-m-d H:i:s')]);
+        }
+
 
         Task::create($request->all());
         return redirect()->route('tasks.index')->with('success', '¡Tarea creada exitosamente!');
@@ -71,6 +90,18 @@ class TaskController extends Controller
             'title' => 'required',
             'description' => 'required'
         ]);
+
+        if ($request->status === null) {
+            $request->merge(['status' => 'Pendiente']);
+        }
+
+        if ($request->status === 'Pendiente' || $request->status == 'En progreso') {
+            $request->merge(['finish_date' => null]);
+        }
+
+        if ($request->status == 'Completada') {
+            $request->merge(['finish_date' => date('Y-m-d H:i:s')]);
+        }
 
         $task->update($request->all());
         return redirect()->route('tasks.index')->with('success', '¡Tarea actualizada exitosamente!');

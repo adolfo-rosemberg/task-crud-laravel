@@ -26,6 +26,7 @@
                 <th>Tarea</th>
                 <th>Descripción</th>
                 <th>Fecha límite</th>
+                <th>Fecha de completado</th>
                 <th>Estado</th>
                 <th>Acción</th>
             </tr>
@@ -35,6 +36,9 @@
                 <td>{{$task->description}}</td>
                 <td>
                     {{$task->due_date}}
+                </td>
+                <td>
+                    {{$task->finish_date}}
                 </td>
                 <td>
                     @switch($task->status)
